@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendario de adviento para mi amor</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6efe6; --ink:#3b1f26; --muted:#7a5a60; --door:#9c2f45; --door2:#2f5d50; --door3:#c98a2b;
+  --doorink:#fff8ee; --card:#fffaf3; --lock:#d9ccbd; --lockink:#8a7a72;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark; --bg:#14302b; --ink:#fbeede; --muted:#b9c9c1; --door:#b8435b; --door2:#3f7d6b; --door3:#d9a043;
+    --doorink:#fff8ee; --card:#1d443d; --lock:#244d45; --lockink:#7fa398;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#14302b; --ink:#fbeede; --muted:#b9c9c1; --door:#b8435b; --door2:#3f7d6b; --door3:#d9a043;
+  --doorink:#fff8ee; --card:#1d443d; --lock:#244d45; --lockink:#7fa398;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Caveat",cursive,sans-serif;min-height:100vh}
+main{max-width:720px;margin:0 auto;padding:28px 16px 40px}
+h1{font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:clamp(2rem,8vw,3.2rem);line-height:1.05;margin:0 0 8px;text-align:left}
+.sub{font-size:1.5rem;color:var(--muted);margin:0 0 20px;max-width:30ch;line-height:1.15}
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px;font-size:1.25rem;color:var(--muted)}
+.bar label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(8,1fr);gap:12px}}
+.door{aspect-ratio:1;border:0;border-radius:14px;font-family:"Fraunces",Georgia,serif;font-weight:800;font-size:clamp(1.4rem,6vw,2rem);color:var(--doorink);background:var(--door);cursor:pointer;position:relative;transition:transform .15s}
+.door small{display:block;font-family:"Caveat",cursive;font-weight:500;font-size:.9rem;line-height:1}
+.door:nth-child(3n+2){background:var(--door2)}
+.door:nth-child(3n){background:var(--door3);color:#3b1f26}
+.door:hover:not(:disabled){transform:rotate(-3deg) scale(1.04)}
+.door:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.door:disabled{background:var(--lock)!important;color:var(--lockink);cursor:not-allowed}
+.door.done::after{content:"♥";position:absolute;right:7px;bottom:3px;font-size:1rem;font-family:sans-serif}
+.door.today{box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--door3)}
+#modal{position:fixed;inset:0;background:rgba(20,10,12,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:5}
+#modal.on{display:flex}
+.note{background:var(--card);color:var(--ink);border-radius:18px;padding:28px 24px 22px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.35);animation:pop .3s ease-out}
+.note .n{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.1rem;color:var(--door)}
+.note p{font-size:2.1rem;line-height:1.1;margin:10px 0 20px}
+.note button{font-family:"Caveat",cursive;font-size:1.5rem;font-weight:700;background:var(--door);color:var(--doorink);border:0;border-radius:10px;padding:6px 20px;cursor:pointer}
+@keyframes pop{from{transform:scale(.85) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.note{animation:none}.door{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Calendario de adviento</h1>
+  <p class="sub" id="sub">Te amo Helli, eres el amor de mi vida peque</p>
+  <div class="bar">
+    <span id="status"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<div id="modal" role="dialog" aria-modal="true" aria-label="Frase del día">
+  <div class="note"><div class="n" id="n"></div><p id="t"></p><button id="close">Cerrar</button></div>
+</div>
+<script>
+const FRASES = [
+"Eres mi lugar favorito en el mundo.",
+"Contigo hasta un martes cualquiera se siente como Navidad.",
+"Gracias por hacerme reír incluso en mis días más grises.",
+"Si pudiera pedir un solo deseo esta Navidad, te elegiría a ti otra vez.",
+"Me encanta cómo haces especiales las cosas pequeñas.",
+"Tu abrazo es mi chimenea favorita.",
+"Cada día descubro algo nuevo de ti, y me gusta todo.",
+"Eres la mejor casualidad que me ha pasado.",
+"Hoy me acordé de tu risa y me cambió el día.",
+"Contigo el frío no existe.",
+"Prometo cuidarte, escucharte y dejarte siempre un pedazo de manta.",
+"Eres mi persona favorita para compartir un chocolate caliente.",
+"A tu lado todo tiene más sentido.",
+"Gracias por creer en mí cuando yo dudaba.",
+"Quiero que este sea el invierno más bonito de tu vida, y quiero pasarlo contigo.",
+"Tu sonrisa ilumina más que todas las luces del árbol.",
+"Eres mi hogar, estés donde estés.",
+"Me haces querer ser mejor persona cada día.",
+"Si mi amor por ti fuera nieve, ya no se vería el suelo.",
+"Mi momento favorito del día es cuando hablo contigo.",
+"Contigo quiero todas las Navidades que me queden.",
+"Gracias por ser mi calma y mi aventura al mismo tiempo.",
+"Mañana es Nochebuena y yo ya tengo mi regalo: tenerte.",
+"Feliz Nochebuena, mi amor. Eres el mejor regalo que me dio la vida."
+];
+const NOV = [
+"Hoy empieza algo bonito: cada día voy a recordarte cuánto te quiero.",
+"Gracias por existir, peque.",
+"Contigo hasta esperar se vuelve lindo.",
+"Eres mi pensamiento favorito de cada mañana.",
+"Me encanta ser tu cómplice en todo.",
+"Hoy te pienso más que ayer, y menos que mañana.",
+"Tus ojos son mi lugar de descanso.",
+"Qué suerte tengo de que me toque quererte.",
+"Eres la razón de mis sonrisas tontas.",
+"Contigo aprendí que el amor también es calma.",
+"Si me preguntan qué es la felicidad, pienso en ti.",
+"Gracias por tu paciencia, tus abrazos y tu cariño.",
+"Eres mi mejor idea, peque.",
+"Ya casi es diciembre, y yo ya estoy feliz porque te tengo.",
+"Mañana empieza diciembre y yo sigo igual: queriéndote como el primer día.",
+"Último día de noviembre: gracias por hacerlo tan especial. Mañana se abre la primera puerta de diciembre."
+];
+const DIAS = NOV.map((f,i)=>({m:10,d:15+i,f})).concat(FRASES.map((f,i)=>({m:11,d:i+1,f})));
+const MESL = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const MES = MESL.map(m=>m.slice(0,3));
+const grid = document.getElementById("grid"), modal = document.getElementById("modal");
+const status = document.getElementById("status");
+let seen = {};
+try { seen = JSON.parse(localStorage.getItem("adviento2") || "{}"); } catch(e) {}
+function save(){ try { localStorage.setItem("adviento2", JSON.stringify(seen)); } catch(e) {} }
+function fecha(x){ return new Date(2026, x.m, x.d); }
+function render(){
+  const ahora = new Date(), todo = location.hash === "#todas";
+  const abierta = x => todo || fecha(x) <= ahora;
+  const prox = DIAS.find(x => !abierta(x));
+  status.textContent = prox ? "La siguiente puerta se abre el " + prox.d + " de " + MESL[prox.m] + "." : "Ya están todas abiertas.";
+  grid.innerHTML = "";
+  DIAS.forEach((x, i) => {
+    const b = document.createElement("button"), ok = abierta(x);
+    const hoy = ahora.getFullYear() === 2026 && ahora.getMonth() === x.m && ahora.getDate() === x.d;
+    b.className = "door" + (seen[i] ? " done" : "") + (hoy ? " today" : "");
+    b.innerHTML = x.d + "<small>" + MES[x.m] + "</small>";
+    b.disabled = !ok;
+    b.setAttribute("aria-label", "Puerta del " + x.d + " de " + MESL[x.m] + (ok ? "" : ", cerrada"));
+    b.onclick = () => open(i);
+    grid.appendChild(b);
+  });
+}
+function open(i){
+  const x = DIAS[i];
+  document.getElementById("n").textContent = x.d + " de " + MESL[x.m];
+  document.getElementById("t").textContent = x.f;
+  modal.classList.add("on");
+  seen[i] = 1; save(); render();
+  document.getElementById("close").focus();
+}
+function shut(){ modal.classList.remove("on"); }
+document.getElementById("close").onclick = shut;
+modal.onclick = e => { if (e.target === modal) shut(); };
+document.addEventListener("keydown", e => { if (e.key === "Escape") shut(); });
+render();
+</script>
+</body>
+</html>
